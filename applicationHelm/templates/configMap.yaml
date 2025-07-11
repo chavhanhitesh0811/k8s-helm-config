@@ -1,0 +1,11 @@
+{{- range $key, $config := .Values.global.configMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $config.name }}
+data:
+{{- range $configKey, $configValue := $config.data }}
+  {{ $configKey }}: {{ $configValue | quote }}
+{{- end }}
+---
+{{- end }}
