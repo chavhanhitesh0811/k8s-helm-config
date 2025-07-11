@@ -122,6 +122,12 @@ tolerations: []
 
 affinity: {}
 
+pvc:
+  - name: shared-doc-pvc
+    accessModes :
+      - ReadWriteMany
+    storage: 5Gi
+
 global:
   configMap:
     dbConfig:
@@ -134,3 +140,10 @@ global:
       data:
         SPRING_DATASOURCE_USERNAME: ZGVtb191c2Vy
         SPRING_DATASOURCE_PASSWORD: c2VjcmV0MTIz
+  volumes: 
+    - name: shared-doc-volume
+      persistentVolumeClaim:
+        claimName: shared-doc-pvc
+  volumeMounts:
+    - name: shared-doc-volume
+      mountPath: /commonp-doc/

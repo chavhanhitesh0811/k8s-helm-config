@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "applicationHelm.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "applicationHelm.labels" . | nindent 4 }}
 spec:

@@ -121,11 +121,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-configMap:
-  keys:
-    SPRING_DATASOURCE_URL: 
-secrets:
-  keys:
-    SPRING_DATASOURCE_USERNAME:
-    SPRING_DATASOURCE_PASSWORD:

@@ -1,0 +1,13 @@
+{{- range $key, $pvc := .Values.pvc }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $pvc.name}}
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes: 
+{{- toYaml $pvc.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ $pvc.storage }}
+{{- end }}
