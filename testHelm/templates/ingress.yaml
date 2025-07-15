@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "application-helm.fullname" . }}
+  name: {{ .Values.ingress.name }}
   namespace: {{ $.Release.Namespace | default "default"}}
 spec:
   {{- with .Values.ingress.className }}
@@ -20,9 +20,9 @@ spec:
             {{- end }}
             backend:
               service:
-                name: app-local-demo-app-backend
+                name: {{ $.Values.services.demoAppBackend.name }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ $.Values.services.demoAppBackend.port }}
           {{- end }}
     {{- end }}
 {{- end }}

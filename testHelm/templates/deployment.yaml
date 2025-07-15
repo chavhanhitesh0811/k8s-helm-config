@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.postgres.name }}
+  namespace: {{ $.Release.Namespace | default "default" }}
+  labels:
+    app: {{ .Values.deployments.postgres.label }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas : {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployments.postgres.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployments.postgres.label}}
+    spec:
+      containers:
+        - name: "{{ .Values.deployments.postgres.label}}-pod"
+          image: "{{ .Values.deployments.postgres.repository }}:{{ .Values.deployments.postgres.tag }}"
+          ports:
+            - containerPort: {{ .Values.deployments.postgres.port }}
+          env:
+          {{- range $key, $value := .Values.configMap.postgresConfig.data }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Values.configMap.postgresConfig.name }}
+                  key: {{ $key }}
+          {{- end }}
+          {{- range $key, $value := .Values.secret.postgresSecret.data }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.postgresSecret.name }}
+                  key: {{ $key }}
+          {{- end }}
+          {{- with .Values.volumeMounts.postgres }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+      {{- with .Values.volumes.postgres }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.demoAppBackend.name }}
+  labels:
+    app: {{ .Values.deployments.demoAppBackend.label }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployments.demoAppBackend.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployments.demoAppBackend.label }}
+    spec:
+      containers:
+        - name: "{{ .Values.deployments.demoAppBackend.label }}-pod"
+          image: "{{ .Values.deployments.demoAppBackend.repository }}:{{ .Values.deployments.demoAppBackend.tag }}"
+          ports:
+            - containerPort: {{ .Values.deployments.demoAppBackend.port }}
+          env:
+          {{- range $key, $value := .Values.configMap.demoAppBackendConfig.data }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Values.configMap.demoAppBackendConfig.name }}
+                  key: {{ $key }}
+          {{- end }}
+          {{- range $key, $value := .Values.secret.demoAppBackendSecret.data }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secret.demoAppBackendSecret.name }}
+                  key: {{ $key }}
+          {{- end }}
+          {{- with .Values.volumeMounts.demoAppBackend }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+      {{- with .Values.volumes.demoAppBackend }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,4 +1,4 @@
-{{- range $key, $config := .Values.global.configMap }}
+{{- range $key, $config := .Values.configMap }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

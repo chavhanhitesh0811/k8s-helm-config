@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.postgres.name | quote }}
+  namespace: {{ $.Release.Namespace | default "default" }}
+spec:
+  selector:
+    app: {{ .Values.deployments.postgres.label }}
+  type: {{ .Values.services.postgres.type }}
+  ports:
+    - port: {{ .Values.services.postgres.port }}
+      targetPort: {{ .Values.services.postgres.port }}
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.demoAppBackend.name | quote }}
+  namespace: {{ $.Release.Namespace | default "default" }}
+spec:
+  selector:
+    app: {{ .Values.deployments.demoAppBackend.label }}
+  type: {{ .Values.services.demoAppBackend.type }}
+  ports:
+    - port: {{ .Values.deployments.demoAppBackend.port }}
+      targetPort: {{ .Values.deployments.demoAppBackend.port }}
+      protocol: TCP
