@@ -1,4 +1,4 @@
-# Default values for applicationHelm.
+# Default values for application-helm.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -54,19 +54,19 @@ service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 80
+  port: 8080
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
-  enabled: false
-  className: ""
+  enabled: true
+  className: "nginx"
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: chart-example.local
+    - host: myapp.example.com
       paths:
-        - path: /
+        - path: /api/demo
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
@@ -123,27 +123,43 @@ tolerations: []
 affinity: {}
 
 pvc:
-  - name: shared-doc-pvc
+  sharedDocPvc:
+    name: shared-doc-pvc
     accessModes :
       - ReadWriteMany
     storage: 5Gi
+  postgres-db-pvc:
+    name: postgres-pvc
+    accessModes:
+      - ReadWriteOnce
+    storage: 1Gi
 
 global:
   configMap:
     dbConfig:
       name: db-config
       data:
-        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-service:5432/demo_db
+        SPRING_DATASOURCE_URL: jdbc:postgresql://app-local-postgres:5432/demo_db
+    postgresConfig:
+      name: postgres-config
+      data:
+        POSTGRES_DB: demo_db
   secrets:
     dbSecret:
       name: db-secret
       data:
         SPRING_DATASOURCE_USERNAME: ZGVtb191c2Vy
         SPRING_DATASOURCE_PASSWORD: c2VjcmV0MTIz
+    postgresSecret:
+      name: postgres-secret
+      data:
+        POSTGRES_USER: ZGVtb191c2Vy
+        POSTGRES_PASSWORD: c2VjcmV0MTIz
+
   volumes: 
     - name: shared-doc-volume
       persistentVolumeClaim:
         claimName: shared-doc-pvc
   volumeMounts:
     - name: shared-doc-volume
-      mountPath: /commonp-doc/
+      mountPath: /common-doc/
